@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meditation Vue</title>
+</head>
+<body>
+    <div id="app">
+        <div class="vid-container">
+            <video loop>
+                <source src="./video/rain.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <div class="time-select">
+            <div
+              v-for="minute in minutes"
+              :key="minute"
+            >
+                <Timer
+                  :minute="minute"
+                ></Timer>
+            </div>
+            <input value="number" v-model="this.customMinute">
+            <button @click="addTimer">Add custome time</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</body>
+</html>
+
+<script>
+// import Timer from './Timer'
+
+Vue.component('Timer', {
+    template: `
+        <button
+          :data-time="minute2seconds">{{ minute }} minutes
+        </button>
+    `,
+    props: {
+        minute: Number
+    },
+    computed: {
+        minute2seconds: function() {
+            return this.minute * 60
+        }
+    }
+
+})
+
+new Vue({
+    el: '#app',
+    data() {
+        return {
+            minutes: [2, 5, 10],
+            customMinute: 0
+        }
+    },
+    methods: {
+        addTimer: function(){
+            this.minutes.push(this.customMinute)
+        }
+    }
+})
+
+</script>

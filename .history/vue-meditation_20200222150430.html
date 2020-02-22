@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meditation Vue</title>
+</head>
+<body>
+    <div id="app">
+        <div class="vid-container">
+            <video loop>
+                <source src="./video/rain.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <div class="time-select">
+            <button
+              v-for="time in times"
+              :key="time.minute"
+              :data-time="">{{ time.minute }} minutes</button>
+            <button @click="">Add custome time</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</body>
+</html>
+
+<script>
+new Vue({
+    el: '#app',
+    data() {
+        return {
+            minutes: [
+                {minute: 2},
+                {minute: 5},
+                {minute: 10}
+            ]
+        }
+    },
+    computed: {
+        minute2seconds: function() {
+            return this.minutes.map(minute => {
+                return minute * 60
+            })
+        }
+    },
+    methods: {
+
+    }
+})
+
+</script>
