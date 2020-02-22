@@ -51,6 +51,12 @@
     font-size: 50px;
 }
 
+#timer-count {
+    margin-top: 5rem;
+    position: absolute;
+    color: white;
+}
+
 video {
     position: fixed;
     top: 0%;
@@ -59,14 +65,21 @@ video {
     z-index: -10;
 }
 
+.flex-container {
+    display: flex;
+}
+.flex-container button {
+    margin: 0 0.3rem;
+}
+
 .time-select button,
 .sound-picker button {
     color: white;
-    width: 30%;
-    height: 10%;
+    width: 5rem;
+    height: 5rem;
     background: none;
     border: 2px solid white;
-    border-radius: 5px;
+    border-radius: 50%;
     font-size: 20px;
     transition: all 0.5s ease;
     cursor: pointer;
@@ -76,7 +89,6 @@ video {
     border: none;
     height: 120px;
     width: 120px;
-    border-radius: 50%;
     padding: 30px;
 }
 
@@ -94,4 +106,17 @@ video {
 .time-select button:hover {
     color: black;
     background-color: white;
+}
+.alert {
+    color: red;
+    border: 1px solid red;
+    background-color: white;
+}
+
+button.alert {
+    color: red;
+    border-color: red;
+}
+button.alert:hover {
+    color: red;
 }

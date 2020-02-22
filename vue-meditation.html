@@ -9,8 +9,7 @@
 <body>
     <div id="app">
         <div class="vid-container">
-            <video loop>
-                <source src="./video/rain.mp4" type="video/mp4">
+            <video loop :src="video" ref="video">
             </video>
         </div>
 
@@ -19,16 +18,18 @@
                 v-for="minute in minutes"
                 :key="minute"
                 :minute="minute"
+                @set-timer="setTimer(minute)"
+                @delete-timer="removeTimer(minute)"
             ></Timer>
             <input value="number" v-model="customMinute">
             <button @click="addTimer">Add custome time</button>
+            <span class="alert" v-show="isDuplicated">There's already a timer with this value!</span>
         </div>
 
         <div class="player-container">
-            <audio class="song">
-                <source src="./sounds/rain.mp3">
+            <audio :src="audio" ref="audio">
             </audio>
-            <img src="./svg/play.svg" alt="play" class="play"></img>
+            <img :src="playOrPause" alt="play" @click="playMusic"></img>
             <svg
               class="track-outline"
               width="453"
@@ -58,17 +59,14 @@
                   r="216.5"
                   stroke="#018EBA"
                   stroke-width="20"
+                  ref="outline"
                 />
             </svg>
-            <img src="./svg/replay.svg" class="replay"></img>
-            <h3 class="time-display">0:00</h3>
+            <h2 id="timer-count">{{ timeLeft }}</h2>
         </div>
         <div class="sound-picker">
-            <button data-sound="./sounds/rain.mp3" data-video="./video/rain.mp4">
-                <img src="./svg/rain.svg" alt="rain">
-            </button>
-            <button data-sound="./sounds/beach.mp3" data-video="./video/beach.mp4">
-                <img src="./svg/beach.svg" alt="beach">
+            <button @click="toggleTheme" :style="themeButtonColor">
+                <img :src="soundIcon">
             </button>
         </div>
     </div>
@@ -80,20 +78,28 @@
 <script>
 // import Timer from './Timer'
 
+
 Vue.component('Timer', {
     template: `
-        <button
-          :data-time="minute2seconds">{{ minute }} minutes
-        </button>
+        <div class="flex-container">
+            <button
+              @click="setTimer"
+            >{{ minute }} minutes
+            </button>
+            <button class="alert" @click="deleteTimer">Delete</button>
+        </div>
     `,
     props: {
         minute: Number
     },
-    computed: {
-        minute2seconds: function() {
-            return this.minute * 60
+    methods: {
+        setTimer: function(){
+            this.$emit('set-timer', this.minute)
+        },
+        deleteTimer: function(){
+            this.$emit('delete-timer', this.minute)
         }
-    }
+    },
 
 })
 
@@ -102,12 +108,86 @@ new Vue({
     data() {
         return {
             minutes: [2, 5, 10],
-            customMinute: 0
+            customMinute: 0,
+            duration: 60,
+            circleLength: 0,
+            isDuplicated : false,
+            playOrPause: './svg/play.svg',
+            audio: './sounds/rain.mp3',
+            video: './video/rain.mp4',
+            soundIcon: './svg/beach.svg',
+            themeButtonColor: 'background-color: #a14f49;'
         }
     },
+    computed: {
+        timeLeft: function(){
+            return `${Math.floor(this.duration / 60)}: ${Math.floor(this.duration % 60)}`
+        },
+    },
     methods: {
+        setTimer: function(minute){
+            this.duration = minute * 60
+        },
         addTimer: function(){
-            this.minutes.push(this.customMinute)
+            const customMinute = Number(this.customMinute)
+            if(this.minutes.indexOf(customMinute) != -1){
+                this.isDuplicated = true
+            } else{
+                this.minutes.push(customMinute)
+                this.isDuplicated = false
+            }
+            this.customMinute = 0
+        },
+        removeTimer: function(minute){
+            this.minutes.splice(this.minutes.indexOf(minute), 1)
+        },
+        tiktak: function() {
+            if(this.duration > 0) {
+                this.duration  --
+            } else {
+                this.$refs.audio.pause();
+                this.playOrPause = './svg/play.svg';
+                this.$refs.video.pause();
+            }
+        },
+        playMusic: function(){
+            const audio = this.$refs.audio;
+            const video = this.$refs.video;
+            if(audio.paused) {
+                audio.play();
+                video.play();
+                this.playOrPause = './svg/pause.svg'
+                timer = setInterval(this.tiktak, 1000)
+            } else {
+                audio.pause();
+                video.pause();
+                this.playOrPause = './svg/play.svg'
+                clearInterval(timer)
+            }
+        },
+        toggleTheme: function() {
+            const audio = this.$refs.audio;
+            const video = this.$refs.video;
+            if(!audio.paused) {
+                audio.pause();
+                video.pause();
+                this.playOrPause = './svg/play.svg'
+                this.circleLength = this.$refs.outline.pathLength;
+                this.elapsed = audio.currentTime;
+            }
+            if (this.audio === './sounds/rain.mp3') {
+                this.audio = './sounds/beach.mp3';
+                this.video = './video/beach.mp4';
+                this.soundIcon = './svg/rain.svg';
+                this.themeButtonColor = 'background-color: #4972a1;'
+            } else {
+                this.audio = './sounds/rain.mp3';
+                this.video = './video/rain.mp4';
+                this.soundIcon = './svg/beach.svg';
+                this.themeButtonColor = 'background-color: #a14f49;'
+            }
+            clearInterval(timer)
+            this.duration = 60;
         }
     }
 })
